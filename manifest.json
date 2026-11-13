@@ -1,6 +1,6 @@
 {
-  "name": "Mesa de Ayuda – Área de Sistemas",
-  "short_name": "Soporte TI",
+  "name": "Soporte Técnico Sistemas",
+  "short_name": "Soporte Técnico",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f4f6f9",
