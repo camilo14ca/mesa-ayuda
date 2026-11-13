@@ -1,0 +1,30 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Correos de los técnicos que pueden entrar al panel (edite la lista)
+    function esTecnico() {
+      return request.auth != null &&
+        request.auth.token.email in ['camilo@ejemplo.com', 'plutarco@ejemplo.com'];
+    }
+
+    match /tickets/{codigo} {
+      // Cualquiera puede consultar UN ticket si conoce su código
+      allow get: if true;
+
+      // Solo los técnicos ven la lista completa, editan o borran
+      allow list, update, delete: if esTecnico();
+
+      // Cualquiera puede crear un ticket nuevo, con datos válidos
+      allow create: if request.resource.data.codigo == codigo
+        && request.resource.data.estado == 'Abierto'
+        && request.resource.data.tecnico == ''
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() > 0
+        && request.resource.data.nombre.size() <= 100
+        && request.resource.data.descripcion is string
+        && request.resource.data.descripcion.size() > 0
+        && request.resource.data.descripcion.size() <= 2500;
+    }
+  }
+}
