@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mesa de Ayuda – Área de Sistemas</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1e3d">
 <style>
   :root{
     --bg:#f4f6f9; --card:#fff; --ink:#1d2433; --muted:#667085; --line:#e4e7ec;
@@ -26,56 +28,77 @@
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
   label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
   input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}
-  textarea{min-height:110px;resize:vertical}
+  textarea{min-height:100px;resize:vertical}
   input:focus,select:focus,textarea:focus{outline:2px solid #c7d7fe;border-color:var(--pri)}
   .btn{background:var(--pri);color:#fff;border:0;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;font-size:14px}
   .btn:hover{background:var(--pri-d)}
+  .btn:disabled{opacity:.6;cursor:wait}
   .btn.sec{background:#eef2f6;color:var(--ink)}
   .btn.sec:hover{background:#e2e8f0}
   .btn.sm{padding:6px 12px;font-size:13px}
+  .link{background:none;border:0;color:var(--pri);cursor:pointer;font-size:13px;padding:0;text-decoration:underline}
   .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .hidden{display:none!important}
+  .muted{color:var(--muted)}
+
+  /* pasos del formulario */
+  .steps{display:flex;gap:6px;margin-bottom:16px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+  .steps span{padding:4px 10px;border-radius:999px;background:#eef2f6}
+  .steps span.on{background:#dbe7ff;color:#1747c7;font-weight:650}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+  .tile{border:1px solid var(--line);background:#fff;border-radius:12px;padding:16px 12px;cursor:pointer;text-align:center;font-size:14px;font-weight:600;color:var(--ink);transition:.15s}
+  .tile:hover{border-color:var(--pri);background:#f5f8ff;transform:translateY(-1px)}
+  .tile .ic{font-size:26px;display:block;margin-bottom:6px}
+  .chosen{display:flex;align-items:center;gap:8px;background:#f5f8ff;border:1px solid #c7d7fe;border-radius:10px;padding:10px 14px;margin-bottom:14px;flex-wrap:wrap}
+  .chosen b{font-size:15px}
+  .checks{display:flex;flex-wrap:wrap;gap:8px}
+  .checks label{font-weight:400;display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:6px 12px;margin:0;cursor:pointer;background:#fff}
+  .checks input{width:auto}
+  .thumb{width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+
   .ok-box{background:#ecfdf3;border:1px solid #abefc6;border-radius:var(--r);padding:18px;text-align:center}
   .ok-box .code{font-size:28px;font-weight:800;letter-spacing:1px;color:#067647;margin:6px 0}
+  .offline{background:#fef3f2;border:1px solid #fecdca;border-radius:var(--r);padding:16px 18px;margin-bottom:18px}
+  .offline h3{margin:0 0 6px;font-size:16px;color:#b42318}
+  .offline ol{margin:8px 0 0;padding-left:20px;font-size:14px}
+  .pend{background:#fffaeb;border:1px solid #fedf89;border-radius:var(--r);padding:12px 16px;margin-bottom:18px;font-size:14px}
+
   .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:650;color:#fff;white-space:nowrap}
   .e-Abierto{background:var(--info)} .e-EnProceso{background:var(--warn)} .e-EnEspera{background:var(--gray)}
   .e-Resuelto{background:var(--ok)} .e-Cerrado{background:#475467}
   .p-Baja{background:#d0d5dd;color:#344054} .p-Media{background:#84adff} .p-Alta{background:var(--warn)} .p-Urgente{background:var(--bad)}
+
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
   .stat{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px}
   .stat b{display:block;font-size:26px}
   .stat span{color:var(--muted);font-size:13px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .chips button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer}
+  .chips button.on{background:#0f1e3d;color:#fff;border-color:#0f1e3d}
+  .chips button i{font-style:normal;background:#f04438;color:#fff;border-radius:999px;padding:0 7px;margin-left:5px;font-size:11px}
+  .chips button.on i{background:#fff;color:#0f1e3d}
   table{width:100%;border-collapse:collapse;font-size:14px}
   th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
   th{font-size:12px;text-transform:uppercase;color:var(--muted);letter-spacing:.4px}
   tbody tr{cursor:pointer}
   tbody tr:hover{background:#f8fafc}
   .tbl-wrap{overflow-x:auto}
-  .muted{color:var(--muted)}
   .timeline{border-left:2px solid var(--line);margin:10px 0 0 6px;padding-left:14px}
   .timeline div{margin-bottom:10px;font-size:14px}
   .timeline small{color:var(--muted);display:block}
   .modal-bg{position:fixed;inset:0;background:rgba(15,30,61,.45);display:flex;align-items:flex-start;justify-content:center;padding:30px 12px;overflow-y:auto;z-index:20}
-  .modal{background:#fff;border-radius:var(--r);max-width:720px;width:100%;padding:22px}
-  .kv{display:grid;grid-template-columns:140px 1fr;gap:6px 12px;font-size:14px;margin:12px 0}
+  .modal{background:#fff;border-radius:var(--r);max-width:760px;width:100%;padding:22px}
+  .kv{display:grid;grid-template-columns:150px 1fr;gap:6px 12px;font-size:14px;margin:12px 0}
   .kv span:nth-child(odd){color:var(--muted)}
+  .box{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:16px}
+  .box h3{margin:0 0 10px;font-size:15px}
+  .cambio{border-bottom:1px dashed var(--line);padding:8px 0;font-size:14px}
+  .cambio:last-child{border-bottom:0}
   .bars div{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:13px}
-  .bars .lbl{width:150px;flex-shrink:0}
+  .bars .lbl{width:170px;flex-shrink:0}
   .bars .bar{height:14px;background:var(--pri);border-radius:4px;min-width:2px}
   .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
-  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f1e3d;color:#fff;padding:10px 18px;border-radius:8px;font-size:14px;z-index:30}
-  @media print{header,nav,.demo,.no-print{display:none!important}}
-</style>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f1e3d">
-<style>
-  .quick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-  .quick button{border:1px solid var(--line);background:#f8fafc;border-radius:999px;padding:8px 14px;cursor:pointer;font-size:14px}
-  .quick button:hover{background:#eef4ff;border-color:#c7d7fe}
-  .offline{background:#fef3f2;border:1px solid #fecdca;border-radius:var(--r);padding:16px 18px;margin-bottom:18px}
-  .offline h3{margin:0 0 6px;font-size:16px;color:#b42318}
-  .offline ol{margin:8px 0 0;padding-left:20px;font-size:14px}
-  .pend{background:#fffaeb;border:1px solid #fedf89;border-radius:var(--r);padding:12px 16px;margin-bottom:18px;font-size:14px}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f1e3d;color:#fff;padding:10px 18px;border-radius:8px;font-size:14px;z-index:30;max-width:90vw}
   .labels{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:14px}
   .lab{border:2px dashed #98a2b3;border-radius:10px;padding:10px;display:flex;gap:10px;align-items:center;break-inside:avoid;background:#fff}
   .lab .qr{flex-shrink:0;width:96px;height:96px}
@@ -83,7 +106,8 @@
   .lab b{font-size:13px;display:block}
   .lab small{font-size:11px;color:#344054;display:block;line-height:1.35}
   @media print{
-    body.print-labels main > section:not(#v-panel), body.print-labels #labelsTools, body.print-labels #labelsTools2, body.print-labels #labelsCard h2{display:none!important}
+    header,nav,.demo,.no-print{display:none!important}
+    body.print-labels main > section:not(#v-panel), body.print-labels #labelsTools, body.print-labels #labelsCard h2{display:none!important}
     body.print-labels #v-panel, body.print-labels #panel, body.print-labels #labelsCard{display:block!important}
     body.print-labels #panel > *:not(#labelsCard), body.print-labels #loginCard{display:none!important}
     body.print-labels #labelsCard{border:0;padding:0}
@@ -123,54 +147,59 @@
       </ol>
     </div>
     <div class="pend hidden" id="pendBox"></div>
+
     <div class="card" id="formCard">
       <h2>Reportar un problema</h2>
-      <p class="sub">Toque una opción rápida o llene el formulario. Toma menos de un minuto.</p>
-      <div class="quick" id="quick">
-        <button type="button" data-t="Internet / Red" data-p="Alta" data-d="El equipo no se conecta a internet.">📶 No hay internet</button>
-        <button type="button" data-t="Equipo de cómputo" data-p="Alta" data-d="El computador no enciende / se apaga solo.">💻 PC no enciende</button>
-        <button type="button" data-t="Equipo de cómputo" data-p="Media" data-d="El computador está muy lento.">🐢 PC lento</button>
-        <button type="button" data-t="Huellero" data-p="Alta" data-d="El huellero no lee / no es reconocido.">☝️ Huellero no lee</button>
-        <button type="button" data-t="Cámara" data-p="Media" data-d="La cámara no funciona.">📷 Cámara</button>
-        <button type="button" data-t="Impresora" data-p="Media" data-d="La impresora no imprime.">🖨️ Impresora</button>
-        <button type="button" data-t="Software / Aplicativo" data-p="Alta" data-d="El aplicativo no abre / sale un error.">⚠️ Error en aplicativo</button>
-        <button type="button" data-t="Correo / Cuentas / Contraseñas" data-p="Media" data-d="Olvidé mi contraseña / cuenta bloqueada.">🔑 Contraseña</button>
+      <div class="steps"><span id="st1" class="on">1. Su área</span><span id="st2">2. ¿Qué pasa?</span><span id="st3">3. Sus datos</span></div>
+
+      <!-- Paso 1 -->
+      <div id="step1">
+        <p class="sub">¿En qué área trabaja?</p>
+        <div class="tiles" id="areaTiles"></div>
       </div>
-      <form id="fTicket">
+
+      <!-- Paso 2 -->
+      <div id="step2" class="hidden">
+        <div class="chosen"><span>Área:</span><b id="lblArea"></b><button type="button" class="link" data-back="1">cambiar</button></div>
+        <p class="sub">¿Qué problema tiene?</p>
+        <div class="tiles" id="probTiles"></div>
+      </div>
+
+      <!-- Paso 3 -->
+      <form id="fTicket" class="hidden">
+        <div class="chosen"><span>Área:</span><b id="lblArea2"></b><span class="muted">·</span><span id="lblProbIc"></span><b id="lblProb"></b><button type="button" class="link" data-back="2">cambiar</button></div>
+
+        <div id="elemBox" class="hidden" style="margin-bottom:14px">
+          <label>¿Qué elementos necesita cambiar? *</label>
+          <div class="checks" id="elemChecks"></div>
+        </div>
+
         <div class="grid">
           <div><label>Nombre completo *</label><input name="nombre" required maxlength="100"></div>
           <div><label>Teléfono / WhatsApp *</label><input name="telefono" required maxlength="20" inputmode="tel"></div>
-          <div><label>Área *</label>
-            <select name="area" required>
-              <option value="">Seleccione…</option>
-              <option>Promotores en campo</option><option>Gerencia</option><option>Área técnica</option>
-              <option>Coordinación</option><option>Administrativa</option><option>Bodega</option><option>Otra</option>
-            </select></div>
           <div><label>Sede / ubicación</label><input name="ubicacion" maxlength="100" placeholder="Ej: Comuna 6, oficina principal"></div>
-          <div><label>Tipo de problema *</label>
-            <select name="tipo" required>
-              <option value="">Seleccione…</option>
-              <option>Equipo de cómputo</option><option>Impresora</option><option>Internet / Red</option>
-              <option>Huellero</option><option>Cámara</option><option>Software / Aplicativo</option>
-              <option>Correo / Cuentas / Contraseñas</option><option>Solicitud de equipo o insumo</option><option>Otro</option>
-            </select></div>
-          <div><label>Prioridad *</label>
-            <select name="prioridad" required>
+          <div><label>Serial / placa del equipo</label><input name="equipo" maxlength="60" placeholder="Opcional"></div>
+          <div><label>Prioridad</label>
+            <select name="prioridad">
               <option value="Baja">Baja – puedo seguir trabajando</option>
-              <option value="Media" selected>Media – me afecta parcialmente</option>
+              <option value="Media">Media – me afecta parcialmente</option>
               <option value="Alta">Alta – no puedo trabajar</option>
               <option value="Urgente">Urgente – afecta a varias personas</option>
             </select></div>
-          <div><label>Serial / placa del equipo</label><input name="equipo" maxlength="60" placeholder="Opcional"></div>
         </div>
         <div style="margin-top:14px"><label>Describa el problema *</label>
           <textarea name="descripcion" required maxlength="2500" placeholder="¿Qué pasó? ¿Desde cuándo? ¿Sale algún mensaje de error?"></textarea></div>
-        <div class="row" style="margin-top:14px">
+        <div style="margin-top:14px">
+          <label>Foto del problema (opcional)</label>
+          <div class="row"><input type="file" id="fotoReq" accept="image/*" style="max-width:320px"><img id="fotoReqPrev" class="thumb hidden" alt=""></div>
+        </div>
+        <div class="row" style="margin-top:16px">
           <button class="btn" type="submit">Enviar ticket</button>
           <label style="font-weight:400;display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" id="remember" checked style="width:auto"> Recordar mis datos en este equipo</label>
         </div>
       </form>
     </div>
+
     <div class="ok-box hidden" id="okBox">
       <div>✅ Ticket creado correctamente</div>
       <div class="code" id="okCode"></div>
@@ -203,7 +232,7 @@
       <form id="fLogin">
         <div style="margin-bottom:10px"><label>Correo</label><input name="email" type="email" autocomplete="username"></div>
         <div style="margin-bottom:14px"><label>Contraseña</label><input name="pass" type="password" required autocomplete="current-password"></div>
-        <button class="btn" type="submit">Ingresar</button>
+        <div class="row"><button class="btn" type="submit">Ingresar</button><button type="button" class="link" id="btnForgot">¿Olvidó su contraseña?</button></div>
       </form>
     </div>
 
@@ -217,41 +246,45 @@
         </div>
       </div>
 
+      <div class="chips no-print" id="areaChips"></div>
       <div class="stats" id="stats"></div>
+
+      <div class="card">
+        <div class="row no-print" style="margin-bottom:12px">
+          <input id="q" placeholder="Buscar por código, nombre, descripción, serial…" style="flex:1;min-width:200px">
+          <select id="fEstado" style="width:auto"><option value="__activos">Solo activos</option><option value="">Todos los estados</option><option>Abierto</option><option>En proceso</option><option>En espera</option><option>Resuelto</option><option>Cerrado</option></select>
+          <select id="fTipo" style="width:auto"><option value="">Todo tipo de problema</option></select>
+          <select id="fPrio" style="width:auto"><option value="">Toda prioridad</option><option>Urgente</option><option>Alta</option><option>Media</option><option>Baja</option></select>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Código</th><th>Fecha</th><th>Solicitante</th><th>Área</th><th>Problema</th><th>Prioridad</th><th>Estado</th><th>Técnico</th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <p class="muted" id="emptyMsg" style="text-align:center;padding:20px">Sin tickets en esta vista.</p>
+      </div>
+
+      <div class="two">
+        <div class="card"><h2>Tickets por área</h2><div class="bars" id="barArea"></div></div>
+        <div class="card"><h2>Problemas más frecuentes</h2><div class="bars" id="barTipo"></div></div>
+      </div>
 
       <div class="card" id="labelsCard">
         <h2>Etiquetas QR para los equipos</h2>
-        <p class="sub" id="labelsTools">Una línea por equipo: <code>SERIAL;Área;Ubicación</code>. Al escanear el QR con el celular se abre el formulario con el equipo ya lleno. Imprímalas y péguelas en cada PC o kit.</p>
-        <div id="labelsTools2" class="no-print">
-          <div style="margin-bottom:10px"><label>Enlace público de la mesa de ayuda</label><input id="baseUrl" placeholder="https://camilo14ca.github.io/mesa-ayuda/"></div>
-          <textarea id="labelsIn" style="min-height:90px" placeholder="PC-001;Promotores en campo;Comuna 6&#10;PC-002;Gerencia;Oficina principal"></textarea>
+        <div id="labelsTools" class="no-print">
+          <p class="sub">Elija el área y escriba una línea por equipo: <code>SERIAL;Ubicación</code>. Al escanear el QR con el celular se abre el formulario con el área y el equipo ya llenos.</p>
+          <div class="grid" style="margin-bottom:10px">
+            <div><label>Enlace público de la mesa de ayuda</label><input id="baseUrl" placeholder="https://camilo14ca.github.io/mesa-ayuda/"></div>
+            <div><label>Área de estos equipos</label><select id="labelsArea"></select></div>
+          </div>
+          <textarea id="labelsIn" style="min-height:90px" placeholder="PC-001;Comuna 6&#10;PC-002;Oficina principal"></textarea>
           <div class="row" style="margin-top:10px">
             <button class="btn sm" id="btnLabels">Generar etiquetas</button>
             <button class="btn sec sm" id="btnPrintLabels">Imprimir etiquetas</button>
           </div>
         </div>
         <div class="labels" id="labelsOut"></div>
-      </div>
-
-      <div class="card">
-        <div class="row no-print" style="margin-bottom:12px">
-          <input id="q" placeholder="Buscar por código, nombre, descripción…" style="flex:1;min-width:200px">
-          <select id="fEstado" style="width:auto"><option value="">Todos los estados</option><option>Abierto</option><option>En proceso</option><option>En espera</option><option>Resuelto</option><option>Cerrado</option><option value="__activos">Solo activos</option></select>
-          <select id="fArea" style="width:auto"><option value="">Todas las áreas</option></select>
-          <select id="fPrio" style="width:auto"><option value="">Toda prioridad</option><option>Urgente</option><option>Alta</option><option>Media</option><option>Baja</option></select>
-        </div>
-        <div class="tbl-wrap">
-          <table>
-            <thead><tr><th>Código</th><th>Fecha</th><th>Solicitante</th><th>Área</th><th>Tipo</th><th>Prioridad</th><th>Estado</th><th>Técnico</th></tr></thead>
-            <tbody id="tbody"></tbody>
-          </table>
-        </div>
-        <p class="muted" id="emptyMsg" style="text-align:center;padding:20px">Sin tickets todavía.</p>
-      </div>
-
-      <div class="two">
-        <div class="card"><h2>Tickets por área</h2><div class="bars" id="barArea"></div></div>
-        <div class="card"><h2>Problemas más frecuentes</h2><div class="bars" id="barTipo"></div></div>
       </div>
     </div>
   </section>
@@ -265,8 +298,6 @@
 <script>
 /* =========================================================
    CONFIGURACIÓN
-   1) Pegue aquí la configuración de su proyecto Firebase.
-   2) Deje apiKey vacío para usar el MODO DEMO (localStorage).
    ========================================================= */
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDwxmI6bW9Fykm8pDQBbYjp_oFUL5xxDeo",
@@ -277,7 +308,39 @@ const FIREBASE_CONFIG = {
   appId: "1:903302932535:web:b93bcb817ddc44383fb7b2"
 };
 const TECNICOS = ["Camilo Cárdenas"]; // edite la lista de técnicos
-const DEMO_PIN = "admin"; // contraseña del panel solo en modo demo
+const DEMO_PIN = "admin";              // contraseña del panel solo en modo demo
+
+/* Catálogo de problemas */
+const PROBLEMAS = {
+  internet:  { t:"PC sin internet",                    cat:"Internet / Red",      p:"Alta",    i:"📶", d:"El computador no se conecta a internet." },
+  noprende:  { t:"PC no prende",                       cat:"Equipo de cómputo",   p:"Alta",    i:"💻", d:"El computador no enciende o se apaga solo." },
+  lento:     { t:"PC lento / se bloquea",              cat:"Equipo de cómputo",   p:"Media",   i:"🐢", d:"El computador está muy lento o se bloquea." },
+  pcfalla:   { t:"El computador no funciona",          cat:"Equipo de cómputo",   p:"Alta",    i:"🖥️", d:"El computador no funciona correctamente." },
+  impresora: { t:"Impresora",                          cat:"Impresora",           p:"Media",   i:"🖨️", d:"La impresora no imprime o atasca el papel." },
+  sisNo:     { t:"No funciona el sistema",             cat:"Sistema",             p:"Urgente", i:"⛔", d:"El sistema no abre o no carga." },
+  sisErr:    { t:"Error en el sistema",                cat:"Sistema",             p:"Alta",    i:"⚠️", d:"El sistema muestra este error: " },
+  sisCambio: { t:"Requerimos un cambio en el sistema", cat:"Sistema",             p:"Media",   i:"🛠️", d:"Solicitamos el siguiente cambio en el sistema: " },
+  huellero:  { t:"Huellero",                           cat:"Huellero",            p:"Alta",    i:"☝️", d:"El huellero no lee o no lo reconoce el sistema." },
+  camara:    { t:"Cámara",                             cat:"Cámara",              p:"Alta",    i:"📷", d:"La cámara no funciona o no la detecta el sistema." },
+  tabNo:     { t:"Tablet no prende",                   cat:"Tablet",              p:"Alta",    i:"📱", d:"La tablet no enciende o no carga." },
+  tabNet:    { t:"Tablet sin internet",                cat:"Tablet",              p:"Media",   i:"📡", d:"La tablet no se conecta a internet." },
+  elementos: { t:"Cambio de elementos",                cat:"Cambio de elementos", p:"Media",   i:"🔁", d:"", elem:true },
+  otro:      { t:"Otro problema",                      cat:"Otro",                p:"Media",   i:"❓", d:"" }
+};
+/* Problemas que ve cada área (siempre se agregan "Cambio de elementos" y "Otro") */
+const AREAS = {
+  "Auxiliar contable":        { i:"🧾", p:["noprende","internet","lento","impresora"] },
+  "Promotores de mesa":       { i:"🪑", p:["sisNo","sisErr","sisCambio","internet","noprende"] },
+  "Promotores de comuna":     { i:"🏘️", p:["sisNo","sisErr","internet","noprende","lento"] },
+  "Promotores de registro":   { i:"🪪", p:["huellero","camara","sisNo","sisErr","sisCambio","internet","noprende","lento"] },
+  "Administración":           { i:"🗂️", p:["noprende","internet","lento","impresora"] },
+  "Dirección operativa":      { i:"📋", p:["tabNo","tabNet","noprende","internet","impresora"] },
+  "Área técnica":             { i:"🔧", p:["internet","impresora","pcfalla","noprende"] },
+  "Dirección administrativa": { i:"🏛️", p:["pcfalla","internet","impresora"] },
+  "Bodega":                   { i:"📦", p:["pcfalla","internet","noprende"] },
+  "Otra área":                { i:"➕", p:["noprende","internet","lento","impresora"] }
+};
+const ELEMENTOS = ["Mouse","Teclado","Cargador","Cable de red","Cable de poder","Hub USB","Diadema / audífonos","Monitor","Cámara","Huellero","Batería","Otro"];
 /* ========================================================= */
 
 const DEMO = !FIREBASE_CONFIG.apiKey;
@@ -286,7 +349,12 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const cls = s => String(s||"").replace(/\s+(\w)/g,(m,c)=>c.toUpperCase()).replace(/[^A-Za-z]/g,"");
 const fmt = ms => ms ? new Date(ms).toLocaleString("es-CO",{dateStyle:"short",timeStyle:"short"}) : "—";
-const toast = m => { const d=document.createElement("div"); d.className="toast"; d.textContent=m; document.body.appendChild(d); setTimeout(()=>d.remove(),2600); };
+const toast = m => { const d=document.createElement("div"); d.className="toast"; d.textContent=m; document.body.appendChild(d); setTimeout(()=>d.remove(),3000); };
+const LS = {
+  get(k, d){ try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+const probsDe = area => [...((AREAS[area] || AREAS["Otra área"]).p), "elementos", "otro"];
 
 function genCode(){
   const d = new Date(), p = n => String(n).padStart(2,"0");
@@ -296,14 +364,29 @@ function genCode(){
   return `TK-${String(d.getFullYear()).slice(2)}${p(d.getMonth()+1)}${p(d.getDate())}-${r}`;
 }
 
+/* Reduce una foto para guardarla dentro del ticket (~100 KB) */
+function compressImage(file, max = 1000, q = 0.6){
+  return new Promise((ok, fail) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const s = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement("canvas"); c.width = Math.round(img.width*s); c.height = Math.round(img.height*s);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); ok(c.toDataURL("image/jpeg", q));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); fail(new Error("No se pudo leer la imagen")); };
+    img.src = url;
+  });
+}
+
 /* ---------------- Capa de datos ---------------- */
 let store;
 
 function demoStore(){
   const KEY = "mesaAyuda_tickets";
   let listeners = [];
-  const read = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
-  const write = o => { try { localStorage.setItem(KEY, JSON.stringify(o)); } catch {} listeners.forEach(cb => cb(Object.values(o))); };
+  const read = () => LS.get(KEY, {});
+  const write = o => { LS.set(KEY, o); listeners.forEach(cb => cb(Object.values(o))); };
   let authed = false, authCb = () => {};
   return {
     async create(t){ const o = read(); o[t.codigo] = t; write(o); },
@@ -312,6 +395,7 @@ function demoStore(){
     subscribe(cb){ listeners.push(cb); cb(Object.values(read())); return () => listeners = listeners.filter(x => x !== cb); },
     async login(email, pass){ if (pass !== DEMO_PIN) throw new Error("Contraseña incorrecta (demo: admin)"); authed = true; authCb({email: email || "demo"}); },
     async logout(){ authed = false; authCb(null); },
+    async reset(){ throw new Error("En modo demo la contraseña es: admin"); },
     onAuth(cb){ authCb = cb; cb(authed ? {email:"demo"} : null); }
   };
 }
@@ -324,6 +408,7 @@ async function firebaseStore(){
   await Promise.all([loadScript(base + "firebase-firestore-compat.js"), loadScript(base + "firebase-auth-compat.js")]);
   firebase.initializeApp(FIREBASE_CONFIG);
   const db = firebase.firestore(), auth = firebase.auth(), col = db.collection("tickets");
+  auth.languageCode = "es";
   return {
     async create(t){ await col.doc(t.codigo).set(t); },
     async get(code){ const s = await col.doc(code).get(); return s.exists ? s.data() : null; },
@@ -331,6 +416,7 @@ async function firebaseStore(){
     subscribe(cb){ return col.orderBy("creado","desc").limit(1000).onSnapshot(s => cb(s.docs.map(d => d.data())), e => toast("Error: " + e.message)); },
     async login(email, pass){ await auth.signInWithEmailAndPassword(email, pass); },
     async logout(){ await auth.signOut(); },
+    async reset(email){ await auth.sendPasswordResetEmail(email); },
     onAuth(cb){ auth.onAuthStateChanged(cb); }
   };
 }
@@ -341,37 +427,70 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   ["reportar","consultar","panel"].forEach(v => $("#v-"+v).classList.toggle("hidden", v !== b.dataset.view));
 });
 
-/* ---------------- Facilidades de reporte ---------------- */
-const LS = {
-  get(k, d){ try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
-  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
-};
+/* ---------------- Reportar: pasos ---------------- */
 const F = () => $("#fTicket");
+let sel = { area:"", prob:"" }, fotoReq = "";
 
-document.querySelectorAll("#quick button").forEach(b => b.onclick = () => {
-  F().tipo.value = b.dataset.t; F().prioridad.value = b.dataset.p;
-  if (!F().descripcion.value.trim()) F().descripcion.value = b.dataset.d + " ";
-  document.querySelectorAll("#quick button").forEach(x => x.style.background = x === b ? "#dbe7ff" : "");
-  const first = ["nombre","telefono","area"].find(n => !F()[n].value);
-  (first ? F()[first] : F().descripcion).focus();
-});
+function goStep(n){
+  $("#step1").classList.toggle("hidden", n !== 1);
+  $("#step2").classList.toggle("hidden", n !== 2);
+  F().classList.toggle("hidden", n !== 3);
+  [1,2,3].forEach(i => $("#st"+i).classList.toggle("on", i === n));
+}
+
+function renderAreas(){
+  $("#areaTiles").innerHTML = Object.entries(AREAS).map(([a, o]) =>
+    `<button type="button" class="tile" data-area="${esc(a)}"><span class="ic">${o.i}</span>${esc(a)}</button>`).join("");
+  document.querySelectorAll("#areaTiles .tile").forEach(b => b.onclick = () => chooseArea(b.dataset.area));
+}
+function chooseArea(a){
+  sel.area = a;
+  $("#lblArea").textContent = a; $("#lblArea2").textContent = a;
+  $("#probTiles").innerHTML = probsDe(a).map(k =>
+    `<button type="button" class="tile" data-p="${k}"><span class="ic">${PROBLEMAS[k].i}</span>${esc(PROBLEMAS[k].t)}</button>`).join("");
+  document.querySelectorAll("#probTiles .tile").forEach(b => b.onclick = () => chooseProb(b.dataset.p));
+  goStep(2);
+}
+function chooseProb(k){
+  const P = PROBLEMAS[k]; sel.prob = k;
+  $("#lblProb").textContent = P.t; $("#lblProbIc").textContent = P.i;
+  F().prioridad.value = P.p;
+  $("#elemBox").classList.toggle("hidden", !P.elem);
+  const d = F().descripcion;
+  if (!d.dataset.touched) d.value = P.d;
+  d.placeholder = P.elem ? "Ej: el mouse no da clic, el teclado tiene teclas dañadas…" : "¿Qué pasó? ¿Desde cuándo? ¿Sale algún mensaje de error?";
+  goStep(3);
+  const first = ["nombre","telefono"].find(n => !F()[n].value);
+  (first ? F()[first] : d).focus();
+}
+document.querySelectorAll("[data-back]").forEach(b => b.onclick = () => goStep(+b.dataset.back));
+F().descripcion.addEventListener("input", e => e.target.dataset.touched = e.target.value.trim() ? "1" : "");
+$("#elemChecks").innerHTML = ELEMENTOS.map(e => `<label><input type="checkbox" value="${esc(e)}"> ${esc(e)}</label>`).join("");
+
+$("#fotoReq").onchange = async e => {
+  const f = e.target.files[0]; fotoReq = "";
+  $("#fotoReqPrev").classList.add("hidden");
+  if (!f) return;
+  try { fotoReq = await compressImage(f, 900, 0.55); $("#fotoReqPrev").src = fotoReq; $("#fotoReqPrev").classList.remove("hidden"); }
+  catch(err){ toast(err.message); }
+};
 
 function prefill(){
   const me = LS.get("mesaAyuda_yo", null);
-  if (me) ["nombre","telefono","area","ubicacion"].forEach(k => { if (me[k]) F()[k].value = me[k]; });
+  if (me) ["nombre","telefono","ubicacion"].forEach(k => { if (me[k]) F()[k].value = me[k]; });
   const qp = new URLSearchParams(location.search);
   if (qp.get("eq")) F().equipo.value = qp.get("eq");
-  if (qp.get("area")) { const a = qp.get("area"); if (![...F().area.options].some(o => o.value === a)) F().area.add(new Option(a, a)); F().area.value = a; }
   if (qp.get("ubic")) F().ubicacion.value = qp.get("ubic");
+  const area = qp.get("area") || me?.area;
+  if (area && AREAS[area]) chooseArea(area); else goStep(1);
 }
 
-// Cola de tickets pendientes (sin internet)
+/* Cola de tickets pendientes (sin internet) */
 const QKEY = "mesaAyuda_pendientes";
 function renderPend(){
   const q = LS.get(QKEY, []);
-  const box = $("#pendBox");
-  box.classList.toggle("hidden", !q.length);
-  box.innerHTML = q.length ? `⏳ <b>${q.length} ticket(s) pendiente(s) por enviar</b> (${q.map(t => esc(t.codigo)).join(", ")}). Se enviarán solos cuando vuelva el internet.` : "";
+  $("#pendBox").classList.toggle("hidden", !q.length);
+  $("#pendBox").innerHTML = q.length ? `⏳ <b>${q.length} ticket(s) pendiente(s) por enviar</b> (${q.map(t => esc(t.codigo)).join(", ")}). Se enviarán solos cuando vuelva el internet.` : "";
 }
 let flushing = false;
 async function flushQueue(){
@@ -389,18 +508,23 @@ window.addEventListener("online", updateOnline);
 window.addEventListener("offline", updateOnline);
 setInterval(flushQueue, 30000);
 
-/* ---------------- Reportar ---------------- */
-$("#fTicket").onsubmit = async e => {
+F().onsubmit = async e => {
   e.preventDefault();
+  const P = PROBLEMAS[sel.prob];
+  const elementos = [...document.querySelectorAll("#elemChecks input:checked")].map(x => x.value);
+  if (P.elem && !elementos.length) { toast("Marque al menos un elemento a cambiar"); return; }
   const f = Object.fromEntries(new FormData(e.target).entries());
-  Object.keys(f).forEach(k => f[k] = f[k].trim());
+  Object.keys(f).forEach(k => f[k] = String(f[k]).trim());
   const now = Date.now(), codigo = genCode();
-  const t = { codigo, ...f, estado:"Abierto", tecnico:"", solucion:"", creado:now, actualizado:now, resuelto:null,
+  const t = { codigo, nombre:f.nombre, telefono:f.telefono, area:sel.area, ubicacion:f.ubicacion, equipo:f.equipo,
+              tipo:P.t, categoria:P.cat, prioridad:f.prioridad, descripcion:f.descripcion, elementos,
+              foto: fotoReq || "", estado:"Abierto", tecnico:"", solucion:"", cambios:[],
+              creado:now, actualizado:now, resuelto:null,
               historial:[{fecha:now, texto:"Ticket creado", por:f.nombre}] };
   const btn = e.target.querySelector("button[type=submit]");
   btn.disabled = true; btn.textContent = "Enviando…";
   try {
-    if ($("#remember").checked) LS.set("mesaAyuda_yo", {nombre:f.nombre, telefono:f.telefono, area:f.area, ubicacion:f.ubicacion});
+    if ($("#remember").checked) LS.set("mesaAyuda_yo", {nombre:f.nombre, telefono:f.telefono, area:sel.area, ubicacion:f.ubicacion});
     else LS.set("mesaAyuda_yo", null);
     let offline = !navigator.onLine;
     if (!offline) {
@@ -413,13 +537,13 @@ $("#fTicket").onsubmit = async e => {
       : "Guarde este número para consultar el estado de su solicitud.";
     $("#okCode").textContent = codigo;
     $("#formCard").classList.add("hidden"); $("#okBox").classList.remove("hidden");
-    e.target.reset(); prefill();
-    document.querySelectorAll("#quick button").forEach(x => x.style.background = "");
+    e.target.reset(); delete F().descripcion.dataset.touched; fotoReq = ""; $("#fotoReqPrev").classList.add("hidden");
+    document.querySelectorAll("#elemChecks input").forEach(x => x.checked = false);
   } catch(err){ toast("No se pudo enviar: " + err.message); }
   btn.disabled = false; btn.textContent = "Enviar ticket";
 };
 $("#copyCode").onclick = () => { navigator.clipboard?.writeText($("#okCode").textContent).then(() => toast("Número copiado")).catch(()=>{}); };
-$("#newTicket").onclick = () => { $("#okBox").classList.add("hidden"); $("#formCard").classList.remove("hidden"); };
+$("#newTicket").onclick = () => { $("#okBox").classList.add("hidden"); $("#formCard").classList.remove("hidden"); prefill(); };
 
 /* ---------------- Consultar ---------------- */
 $("#fBuscar").onsubmit = async e => {
@@ -432,7 +556,9 @@ $("#fBuscar").onsubmit = async e => {
     box.innerHTML = `
       <div class="row"><b style="font-size:18px">${esc(t.codigo)}</b> <span class="badge e-${cls(t.estado)}">${esc(t.estado)}</span></div>
       <div class="kv">
-        <span>Tipo</span><span>${esc(t.tipo)}</span>
+        <span>Área</span><span>${esc(t.area)}</span>
+        <span>Problema</span><span>${esc(t.tipo)}</span>
+        ${t.elementos?.length ? `<span>Elementos</span><span>${t.elementos.map(esc).join(", ")}</span>` : ""}
         <span>Creado</span><span>${fmt(t.creado)}</span>
         <span>Técnico</span><span>${esc(t.tecnico) || "Sin asignar"}</span>
         ${t.solucion ? `<span>Solución</span><span>${esc(t.solucion)}</span>` : ""}
@@ -443,12 +569,19 @@ $("#fBuscar").onsubmit = async e => {
 };
 
 /* ---------------- Panel ---------------- */
-let tickets = [], unsub = null, currentUser = null;
+let tickets = [], unsub = null, currentUser = null, areaSel = "";
+const activo = t => !["Resuelto","Cerrado"].includes(t.estado);
 
 $("#fLogin").onsubmit = async e => {
   e.preventDefault();
   try { await store.login(e.target.email.value.trim(), e.target.pass.value); e.target.reset(); }
-  catch(err){ toast("No se pudo ingresar: " + (err.code === "auth/invalid-credential" ? "credenciales incorrectas" : err.message)); }
+  catch(err){ toast("No se pudo ingresar: " + (/invalid-credential|wrong-password|user-not-found/.test(err.code||"") ? "correo o contraseña incorrectos" : err.message)); }
+};
+$("#btnForgot").onclick = async () => {
+  const email = $("#fLogin").email.value.trim();
+  if (!email) { toast("Escriba su correo arriba y vuelva a tocar «¿Olvidó su contraseña?»"); return; }
+  try { await store.reset(email); toast("Le enviamos un correo para cambiar la contraseña (revise también Spam)."); }
+  catch(err){ toast(err.message); }
 };
 $("#btnLogout").onclick = () => store.logout();
 
@@ -462,44 +595,58 @@ function onAuthChange(u){
   } else if (unsub) { unsub(); unsub = null; tickets = []; }
 }
 
-["#q","#fEstado","#fArea","#fPrio"].forEach(s => $(s).addEventListener("input", renderTable));
+["#q","#fEstado","#fTipo","#fPrio"].forEach(s => $(s).addEventListener("input", renderTable));
 
+const enArea = () => tickets.filter(t => !areaSel || t.area === areaSel);
 function filtered(){
-  const q = $("#q").value.toLowerCase(), es = $("#fEstado").value, ar = $("#fArea").value, pr = $("#fPrio").value;
-  return tickets.filter(t =>
-    (!es || (es === "__activos" ? !["Resuelto","Cerrado"].includes(t.estado) : t.estado === es)) &&
-    (!ar || t.area === ar) && (!pr || t.prioridad === pr) &&
-    (!q || [t.codigo,t.nombre,t.descripcion,t.tipo,t.ubicacion,t.equipo,t.tecnico].join(" ").toLowerCase().includes(q)));
+  const q = $("#q").value.toLowerCase(), es = $("#fEstado").value, tp = $("#fTipo").value, pr = $("#fPrio").value;
+  return enArea().filter(t =>
+    (!es || (es === "__activos" ? activo(t) : t.estado === es)) &&
+    (!tp || t.tipo === tp) && (!pr || t.prioridad === pr) &&
+    (!q || [t.codigo,t.nombre,t.descripcion,t.tipo,t.ubicacion,t.equipo,t.tecnico,(t.elementos||[]).join(" ")].join(" ").toLowerCase().includes(q)));
+}
+
+function renderChips(){
+  const areas = [...new Set([...Object.keys(AREAS), ...tickets.map(t => t.area)])].filter(Boolean);
+  const n = a => tickets.filter(t => activo(t) && (!a || t.area === a)).length;
+  $("#areaChips").innerHTML = [["", "Todas"], ...areas.map(a => [a, a])].map(([v, l]) => {
+    const c = n(v);
+    return `<button data-a="${esc(v)}" class="${v === areaSel ? "on" : ""}">${esc(l)}${c ? `<i>${c}</i>` : ""}</button>`;
+  }).join("");
+  document.querySelectorAll("#areaChips button").forEach(b => b.onclick = () => { areaSel = b.dataset.a; renderPanel(); });
 }
 
 function renderPanel(){
-  // filtro de áreas
-  const sel = $("#fArea"), cur = sel.value;
-  const areas = [...new Set(tickets.map(t => t.area))].sort();
-  sel.innerHTML = '<option value="">Todas las áreas</option>' + areas.map(a => `<option ${a===cur?"selected":""}>${esc(a)}</option>`).join("");
+  renderChips();
+  // tipos de problema según el área elegida
+  const tSel = $("#fTipo"), cur = tSel.value;
+  const tipos = areaSel && AREAS[areaSel] ? probsDe(areaSel).map(k => PROBLEMAS[k].t) : [...new Set([...Object.values(PROBLEMAS).map(p => p.t), ...tickets.map(t => t.tipo)])];
+  tSel.innerHTML = '<option value="">Todo tipo de problema</option>' + tipos.map(x => `<option ${x===cur?"selected":""}>${esc(x)}</option>`).join("");
 
-  // estadísticas
-  const c = e => tickets.filter(t => t.estado === e).length;
-  const activos = tickets.filter(t => !["Resuelto","Cerrado"].includes(t.estado));
-  const urg = activos.filter(t => ["Alta","Urgente"].includes(t.prioridad)).length;
-  const res = tickets.filter(t => t.resuelto);
+  const L = enArea();
+  const c = e => L.filter(t => t.estado === e).length;
+  const urg = L.filter(t => activo(t) && ["Alta","Urgente"].includes(t.prioridad)).length;
+  const res = L.filter(t => t.resuelto);
   const avgH = res.length ? res.reduce((s,t) => s + (t.resuelto - t.creado), 0) / res.length / 36e5 : 0;
   const hoy = new Date(); hoy.setHours(0,0,0,0);
-  const hoyN = tickets.filter(t => t.creado >= hoy.getTime()).length;
+  const mes = new Date(); mes.setDate(1); mes.setHours(0,0,0,0);
+  const cambiosMes = L.reduce((s,t) => s + (t.cambios||[]).filter(x => x.fecha >= mes.getTime()).length, 0);
   $("#stats").innerHTML = [
     ["Abiertos", c("Abierto")], ["En proceso", c("En proceso")], ["En espera", c("En espera")],
     ["Resueltos / cerrados", c("Resuelto") + c("Cerrado")], ["Alta / urgente activos", urg],
-    ["Creados hoy", hoyN], ["Tiempo prom. solución", avgH ? (avgH < 24 ? avgH.toFixed(1)+" h" : (avgH/24).toFixed(1)+" días") : "—"]
+    ["Creados hoy", L.filter(t => t.creado >= hoy.getTime()).length],
+    ["Elementos cambiados (mes)", cambiosMes],
+    ["Tiempo prom. solución", avgH ? (avgH < 24 ? avgH.toFixed(1)+" h" : (avgH/24).toFixed(1)+" días") : "—"]
   ].map(([l,v]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
 
-  bars("#barArea", "area"); bars("#barTipo", "tipo");
+  bars("#barArea", tickets, "area"); bars("#barTipo", L, "tipo");
   renderTable();
 }
 
-function bars(sel, key){
-  const m = {}; tickets.forEach(t => m[t[key]] = (m[t[key]]||0) + 1);
-  const arr = Object.entries(m).sort((a,b) => b[1]-a[1]).slice(0,8), max = arr[0]?.[1] || 1;
-  $(sel).innerHTML = arr.length ? arr.map(([k,v]) => `<div><span class="lbl">${esc(k)}</span><span class="bar" style="width:${v/max*60}%"></span><b>${v}</b></div>`).join("") : '<span class="muted">Sin datos</span>';
+function bars(sel, list, key){
+  const m = {}; list.forEach(t => m[t[key]] = (m[t[key]]||0) + 1);
+  const arr = Object.entries(m).sort((a,b) => b[1]-a[1]).slice(0,10), max = arr[0]?.[1] || 1;
+  $(sel).innerHTML = arr.length ? arr.map(([k,v]) => `<div><span class="lbl">${esc(k)}</span><span class="bar" style="width:${v/max*55}%"></span><b>${v}</b></div>`).join("") : '<span class="muted">Sin datos</span>';
 }
 
 function renderTable(){
@@ -508,7 +655,8 @@ function renderTable(){
   $("#tbody").innerHTML = list.map(t => `
     <tr data-code="${esc(t.codigo)}">
       <td><b>${esc(t.codigo)}</b></td><td>${fmt(t.creado)}</td><td>${esc(t.nombre)}</td><td>${esc(t.area)}</td>
-      <td>${esc(t.tipo)}</td><td><span class="badge p-${esc(t.prioridad)}">${esc(t.prioridad)}</span></td>
+      <td>${esc(t.tipo)}${t.elementos?.length ? `<br><small class="muted">${t.elementos.map(esc).join(", ")}</small>` : ""}</td>
+      <td><span class="badge p-${esc(t.prioridad)}">${esc(t.prioridad)}</span></td>
       <td><span class="badge e-${cls(t.estado)}">${esc(t.estado)}</span></td><td>${esc(t.tecnico) || '<span class="muted">—</span>'}</td>
     </tr>`).join("");
   document.querySelectorAll("#tbody tr").forEach(tr => tr.onclick = () => openTicket(tr.dataset.code));
@@ -517,6 +665,7 @@ function renderTable(){
 function openTicket(code){
   const t = tickets.find(x => x.codigo === code); if (!t) return;
   const host = $("#modalHost");
+  const cambios = t.cambios || [];
   host.innerHTML = `
   <div class="modal-bg"><div class="modal">
     <div class="row"><h2 style="margin:0">${esc(t.codigo)}</h2><span class="badge e-${cls(t.estado)}">${esc(t.estado)}</span>
@@ -524,15 +673,18 @@ function openTicket(code){
       <button class="btn sec sm" id="mClose" style="margin-left:auto">Cerrar ✕</button></div>
     <div class="kv">
       <span>Solicitante</span><span>${esc(t.nombre)}</span>
-      <span>Teléfono</span><span>${esc(t.telefono)} ${t.telefono ? `<a href="https://wa.me/57${esc(t.telefono.replace(/\D/g,"").replace(/^57/,""))}" target="_blank" rel="noopener">WhatsApp</a>` : ""}</span>
+      <span>Teléfono</span><span>${esc(t.telefono)} ${t.telefono ? `· <a href="https://wa.me/57${esc(String(t.telefono).replace(/\D/g,"").replace(/^57/,""))}" target="_blank" rel="noopener">WhatsApp</a>` : ""}</span>
       <span>Área</span><span>${esc(t.area)}</span>
       <span>Ubicación</span><span>${esc(t.ubicacion) || "—"}</span>
-      <span>Tipo</span><span>${esc(t.tipo)}</span>
+      <span>Problema</span><span>${esc(t.tipo)}</span>
+      ${t.elementos?.length ? `<span>Elementos pedidos</span><span>${t.elementos.map(esc).join(", ")}</span>` : ""}
       <span>Equipo</span><span>${esc(t.equipo) || "—"}</span>
       <span>Creado</span><span>${fmt(t.creado)}</span>
       <span>Resuelto</span><span>${fmt(t.resuelto)}</span>
     </div>
     <div style="background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:12px;white-space:pre-wrap">${esc(t.descripcion)}</div>
+    ${t.foto ? `<div style="margin-top:10px"><a href="${t.foto}" target="_blank"><img src="${t.foto}" class="thumb" style="width:140px;height:110px" alt="Foto del solicitante"></a></div>` : ""}
+
     <div class="grid" style="margin-top:16px">
       <div><label>Estado</label><select id="mEstado">${ESTADOS.map(e => `<option ${e===t.estado?"selected":""}>${e}</option>`).join("")}</select></div>
       <div><label>Técnico asignado</label><select id="mTec"><option value="">Sin asignar</option>${TECNICOS.map(n => `<option ${n===t.tecnico?"selected":""}>${esc(n)}</option>`).join("")}</select></div>
@@ -540,14 +692,37 @@ function openTicket(code){
     </div>
     <div style="margin-top:12px"><label>Solución aplicada (visible para el solicitante)</label><textarea id="mSol" style="min-height:70px">${esc(t.solucion)}</textarea></div>
     <div style="margin-top:12px"><label>Nota de seguimiento (opcional)</label><input id="mNota" placeholder="Ej: Se revisó en sitio, se cambió cable de red"></div>
-    <div class="row" style="margin-top:14px"><button class="btn" id="mSave">Guardar cambios</button><button class="btn sec" id="mPrint">Imprimir orden</button></div>
+    <div class="row" style="margin-top:14px"><button class="btn" id="mSave">Guardar cambios</button><button class="btn sec" id="mPrint">Imprimir orden de servicio</button></div>
+
+    <div class="box">
+      <h3>🔁 Cambio de elementos – evidencia</h3>
+      <div id="cambiosList">${cambios.length ? cambios.map(cambioHTML).join("") : '<span class="muted" style="font-size:14px">Aún no se ha registrado ningún cambio.</span>'}</div>
+      <div class="grid" style="margin-top:14px">
+        <div><label>Elemento</label><select id="cElem">${ELEMENTOS.map(e => `<option ${t.elementos?.[0]===e?"selected":""}>${esc(e)}</option>`).join("")}</select></div>
+        <div><label>Estado del retirado</label><select id="cEst"><option>Dañado</option><option>Desgastado</option><option>Perdido / no entregado</option><option>Funcional (cambio preventivo)</option></select></div>
+        <div><label>Serial / placa retirado</label><input id="cRet" placeholder="Opcional"></div>
+        <div><label>Serial / placa entregado</label><input id="cEnt" placeholder="Opcional"></div>
+      </div>
+      <div style="margin-top:10px"><label>Observación</label><input id="cObs" placeholder="Ej: mouse sin clic derecho, se entrega mouse nuevo"></div>
+      <div style="margin-top:10px"><label>Fotos de evidencia (máx. 3)</label>
+        <input type="file" id="cFotos" accept="image/*" multiple>
+        <div class="row" id="cPrev" style="margin-top:8px"></div></div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn sm" id="cAdd">Registrar cambio</button>
+        <button class="btn sec sm" id="cActa" ${cambios.length ? "" : "disabled"}>Imprimir acta de cambio</button>
+      </div>
+    </div>
+
     <h3 style="margin:20px 0 0;font-size:15px">Historial</h3>
     <div class="timeline">${(t.historial||[]).slice().reverse().map(h => `<div>${esc(h.texto)}<small>${fmt(h.fecha)} · ${esc(h.por||"")}</small></div>`).join("")}</div>
   </div></div>`;
+
   const close = () => host.innerHTML = "";
   $("#mClose").onclick = close;
   host.querySelector(".modal-bg").onclick = e => { if (e.target.classList.contains("modal-bg")) close(); };
   $("#mPrint").onclick = () => printOrder(t);
+  $("#cActa").onclick = () => printActa(t);
+
   $("#mSave").onclick = async () => {
     const now = Date.now(), por = currentUser?.email || "técnico";
     const estado = $("#mEstado").value, tecnico = $("#mTec").value, prioridad = $("#mPrio").value;
@@ -561,63 +736,117 @@ function openTicket(code){
     if (h.length === (t.historial||[]).length) { toast("No hay cambios"); return; }
     const fin = ["Resuelto","Cerrado"].includes(estado);
     try {
-      await store.update(t.codigo, { estado, tecnico, prioridad, solucion, historial:h, actualizado:now,
-                                     resuelto: fin ? (t.resuelto || now) : null });
+      await store.update(t.codigo, { estado, tecnico, prioridad, solucion, historial:h, actualizado:now, resuelto: fin ? (t.resuelto || now) : null });
       toast("Ticket actualizado"); close();
     } catch(err){ toast("Error: " + err.message); }
   };
+
+  let fotos = [];
+  $("#cFotos").onchange = async e => {
+    const files = [...e.target.files].slice(0, 3); fotos = [];
+    $("#cPrev").innerHTML = '<span class="muted">Procesando fotos…</span>';
+    for (const f of files) { try { fotos.push(await compressImage(f)); } catch {} }
+    $("#cPrev").innerHTML = fotos.map(src => `<img src="${src}" class="thumb" alt="">`).join("");
+  };
+  $("#cAdd").onclick = async () => {
+    const now = Date.now(), por = currentUser?.email || "técnico";
+    const c = { fecha:now, elemento:$("#cElem").value, estadoRetirado:$("#cEst").value, retirado:$("#cRet").value.trim(),
+                entregado:$("#cEnt").value.trim(), obs:$("#cObs").value.trim(), fotos, tecnico: t.tecnico || TECNICOS[0] || por, por };
+    const nuevos = [...cambios, c];
+    const size = JSON.stringify({...t, cambios:nuevos}).length;
+    if (size > 950000) { toast("El ticket ya tiene demasiadas fotos. Registre el cambio con menos fotos."); return; }
+    const h = [...(t.historial||[]), {fecha:now, por,
+      texto:`Cambio de elemento: ${c.elemento}${c.retirado ? " (retirado " + c.retirado + ")" : ""}${c.entregado ? " → entregado " + c.entregado : ""}${fotos.length ? " · " + fotos.length + " foto(s)" : ""}`}];
+    const btn = $("#cAdd"); btn.disabled = true; btn.textContent = "Guardando…";
+    try {
+      await store.update(t.codigo, { cambios:nuevos, historial:h, actualizado:now });
+      toast("Cambio registrado"); setTimeout(() => openTicket(t.codigo), 300);
+    } catch(err){ toast("Error: " + err.message); btn.disabled = false; btn.textContent = "Registrar cambio"; }
+  };
 }
 
-function printOrder(t){
+function cambioHTML(c){
+  return `<div class="cambio"><b>${esc(c.elemento)}</b> · <span class="muted">${fmt(c.fecha)}</span><br>
+    Retirado: ${esc(c.retirado) || "—"} (${esc(c.estadoRetirado)}) · Entregado: ${esc(c.entregado) || "—"}
+    ${c.obs ? `<br><span class="muted">${esc(c.obs)}</span>` : ""}
+    ${(c.fotos||[]).length ? `<div class="row" style="margin-top:6px">${c.fotos.map(src => `<a href="${src}" target="_blank"><img src="${src}" class="thumb" alt="evidencia"></a>`).join("")}</div>` : ""}</div>`;
+}
+
+const PRINT_CSS = `body{font-family:system-ui,sans-serif;padding:28px;color:#111}h1{font-size:19px;margin:0 0 4px}
+  table{width:100%;border-collapse:collapse;margin:14px 0}td,th{border:1px solid #999;padding:7px;font-size:13px;vertical-align:top;text-align:left}
+  td.k{width:170px;background:#f2f2f2;font-weight:600}th{background:#f2f2f2}
+  .fotos img{width:150px;height:120px;object-fit:cover;border:1px solid #999;margin:4px}
+  .firmas{display:flex;gap:40px;margin-top:60px}.firmas div{flex:1;border-top:1px solid #000;text-align:center;padding-top:6px;font-size:13px}`;
+function openPrint(title, body){
   const w = window.open("", "_blank"); if (!w) { toast("Permita ventanas emergentes para imprimir"); return; }
-  w.document.write(`<html><head><title>Orden ${esc(t.codigo)}</title><style>
-    body{font-family:system-ui,sans-serif;padding:30px;color:#111}h1{font-size:20px}table{width:100%;border-collapse:collapse;margin:14px 0}
-    td{border:1px solid #999;padding:8px;font-size:14px;vertical-align:top}td:first-child{width:170px;background:#f2f2f2;font-weight:600}
-    .firmas{display:flex;gap:40px;margin-top:60px}.firmas div{flex:1;border-top:1px solid #000;text-align:center;padding-top:6px;font-size:13px}
-  </style></head><body>
-    <h1>ORDEN DE SERVICIO TÉCNICO – ${esc(t.codigo)}</h1>
-    <div>Área de Sistemas · Programa Adulto Mayor</div>
-    <table>
-      <tr><td>Fecha de solicitud</td><td>${fmt(t.creado)}</td></tr>
-      <tr><td>Solicitante</td><td>${esc(t.nombre)} – ${esc(t.telefono)}</td></tr>
-      <tr><td>Área / ubicación</td><td>${esc(t.area)} – ${esc(t.ubicacion)}</td></tr>
-      <tr><td>Tipo / equipo</td><td>${esc(t.tipo)} – ${esc(t.equipo)}</td></tr>
-      <tr><td>Prioridad</td><td>${esc(t.prioridad)}</td></tr>
-      <tr><td>Descripción</td><td>${esc(t.descripcion)}</td></tr>
-      <tr><td>Técnico</td><td>${esc(t.tecnico)}</td></tr>
-      <tr><td>Estado</td><td>${esc(t.estado)}</td></tr>
-      <tr><td>Solución</td><td style="height:80px">${esc(t.solucion)}</td></tr>
-      <tr><td>Fecha de cierre</td><td>${fmt(t.resuelto)}</td></tr>
-    </table>
-    <div class="firmas"><div>Firma técnico</div><div>Firma solicitante (recibido a satisfacción)</div></div>
-    <script>window.onload=()=>window.print()<\/script></body></html>`);
+  w.document.write(`<html><head><title>${esc(title)}</title><style>${PRINT_CSS}</style></head><body>${body}
+    <script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script></body></html>`);
   w.document.close();
+}
+function printOrder(t){
+  openPrint("Orden " + t.codigo, `
+    <h1>ORDEN DE SERVICIO TÉCNICO – ${esc(t.codigo)}</h1><div>Área de Sistemas · Programa Adulto Mayor</div>
+    <table>
+      <tr><td class="k">Fecha de solicitud</td><td>${fmt(t.creado)}</td></tr>
+      <tr><td class="k">Solicitante</td><td>${esc(t.nombre)} – ${esc(t.telefono)}</td></tr>
+      <tr><td class="k">Área / ubicación</td><td>${esc(t.area)} – ${esc(t.ubicacion)}</td></tr>
+      <tr><td class="k">Problema</td><td>${esc(t.tipo)}${t.elementos?.length ? " – " + t.elementos.map(esc).join(", ") : ""}</td></tr>
+      <tr><td class="k">Equipo</td><td>${esc(t.equipo)}</td></tr>
+      <tr><td class="k">Prioridad</td><td>${esc(t.prioridad)}</td></tr>
+      <tr><td class="k">Descripción</td><td>${esc(t.descripcion)}</td></tr>
+      <tr><td class="k">Técnico</td><td>${esc(t.tecnico)}</td></tr>
+      <tr><td class="k">Estado</td><td>${esc(t.estado)}</td></tr>
+      <tr><td class="k">Solución</td><td style="height:80px">${esc(t.solucion)}</td></tr>
+      <tr><td class="k">Fecha de cierre</td><td>${fmt(t.resuelto)}</td></tr>
+    </table>
+    <div class="firmas"><div>Firma técnico</div><div>Firma solicitante (recibido a satisfacción)</div></div>`);
+}
+function printActa(t){
+  const cs = t.cambios || [];
+  openPrint("Acta cambio " + t.codigo, `
+    <h1>ACTA DE CAMBIO DE ELEMENTOS – ${esc(t.codigo)}</h1><div>Área de Sistemas · Programa Adulto Mayor · ${fmt(Date.now())}</div>
+    <table>
+      <tr><td class="k">Funcionario</td><td>${esc(t.nombre)} – ${esc(t.telefono)}</td></tr>
+      <tr><td class="k">Área / ubicación</td><td>${esc(t.area)} – ${esc(t.ubicacion)}</td></tr>
+      <tr><td class="k">Equipo</td><td>${esc(t.equipo)}</td></tr>
+    </table>
+    <table>
+      <tr><th>Fecha</th><th>Elemento</th><th>Serial retirado</th><th>Estado retirado</th><th>Serial entregado</th><th>Observación</th></tr>
+      ${cs.map(c => `<tr><td>${fmt(c.fecha)}</td><td>${esc(c.elemento)}</td><td>${esc(c.retirado)}</td><td>${esc(c.estadoRetirado)}</td><td>${esc(c.entregado)}</td><td>${esc(c.obs)}</td></tr>`).join("")}
+    </table>
+    ${cs.some(c => c.fotos?.length) ? `<b>Evidencia fotográfica</b><div class="fotos">${cs.flatMap(c => (c.fotos||[]).map(src => `<img src="${src}">`)).join("")}</div>` : ""}
+    <p style="font-size:13px">El funcionario declara recibir a satisfacción los elementos relacionados y entregar los elementos retirados al Área de Sistemas.</p>
+    <div class="firmas"><div>Entrega – Técnico de sistemas</div><div>Recibe – Funcionario</div></div>`);
 }
 
 $("#btnCsv").onclick = () => {
-  const cols = ["codigo","creado","nombre","telefono","area","ubicacion","tipo","equipo","prioridad","estado","tecnico","descripcion","solucion","resuelto"];
-  const val = (t,c) => (c === "creado" || c === "resuelto") ? fmt(t[c]) : (t[c] ?? "");
+  const cols = ["codigo","creado","nombre","telefono","area","ubicacion","tipo","elementos","equipo","prioridad","estado","tecnico","descripcion","solucion","cambios","resuelto"];
+  const val = (t,c) => c === "creado" || c === "resuelto" ? fmt(t[c])
+    : c === "elementos" ? (t.elementos||[]).join(", ")
+    : c === "cambios" ? (t.cambios||[]).map(x => `${x.elemento} (${x.retirado||"-"}→${x.entregado||"-"})`).join(" | ")
+    : (t[c] ?? "");
   const csv = "﻿" + [cols.join(";"), ...filtered().map(t => cols.map(c => `"${String(val(t,c)).replace(/"/g,'""').replace(/\n/g," ")}"`).join(";"))].join("\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8"}));
-  a.download = `tickets_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  a.download = `tickets_${areaSel ? cls(areaSel) + "_" : ""}${new Date().toISOString().slice(0,10)}.csv`; a.click();
 };
 
 /* ---------------- Etiquetas QR ---------------- */
 function defaultBase(){ return location.protocol.startsWith("http") ? location.origin + location.pathname : ""; }
 $("#baseUrl").value = LS.get("mesaAyuda_base", "") || defaultBase();
-$("#btnLabels").onclick = async () => {
-  const base = $("#baseUrl").value.trim();
+$("#labelsArea").innerHTML = Object.keys(AREAS).map(a => `<option>${esc(a)}</option>`).join("");
+$("#btnLabels").onclick = () => {
+  const base = $("#baseUrl").value.trim(), area = $("#labelsArea").value;
   if (!/^https?:\/\//.test(base)) { toast("Escriba el enlace público (https://…)"); return; }
   LS.set("mesaAyuda_base", base);
   const lines = $("#labelsIn").value.split("\n").map(l => l.trim()).filter(Boolean);
   if (!lines.length) { toast("Escriba al menos un equipo"); return; }
   const out = $("#labelsOut"); out.innerHTML = "";
   lines.forEach(l => {
-    const [eq, area = "", ubic = ""] = l.split(";").map(x => x.trim());
-    const u = new URL(base); u.searchParams.set("eq", eq); if (area) u.searchParams.set("area", area); if (ubic) u.searchParams.set("ubic", ubic);
+    const [eq, ubic = ""] = l.split(";").map(x => x.trim());
+    const u = new URL(base); u.searchParams.set("eq", eq); u.searchParams.set("area", area); if (ubic) u.searchParams.set("ubic", ubic);
     const d = document.createElement("div"); d.className = "lab";
-    d.innerHTML = `<div class="qr"></div><div><b>¿Falla el equipo?</b><small>Escanee con su celular y reporte en 1 minuto.</small><small style="margin-top:4px"><b>${esc(eq)}</b>${area ? " · " + esc(area) : ""}</small><small>Sin internet: revise Wi-Fi, modo avión y reinicie.</small></div>`;
+    d.innerHTML = `<div class="qr"></div><div><b>¿Falla el equipo?</b><small>Escanee con su celular y reporte en 1 minuto.</small><small style="margin-top:4px"><b>${esc(eq)}</b> · ${esc(area)}</small><small>Sin internet: revise Wi-Fi, modo avión y reinicie.</small></div>`;
     out.appendChild(d);
     const qr = qrcode(0, "M"); qr.addData(u.toString()); qr.make();
     d.querySelector(".qr").innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
@@ -631,11 +860,11 @@ $("#btnPrintLabels").onclick = () => {
 };
 
 /* ---------------- Inicio ---------------- */
+renderAreas();
 (async () => {
   try { store = DEMO ? demoStore() : await firebaseStore(); }
   catch(e){ toast("No se pudo conectar con Firebase; usando modo demo"); store = demoStore(); }
-  if (store && DEMO) { $("#demoBar").classList.remove("hidden"); $("#loginHint").textContent = "Modo demo: escriba cualquier correo y la contraseña «admin»."; }
-  // ?t=CODIGO abre la consulta directa
+  if (store && (DEMO || !window.firebase)) { $("#demoBar").classList.remove("hidden"); $("#loginHint").textContent = "Modo demo: escriba cualquier correo y la contraseña «admin»."; }
   const qp = new URLSearchParams(location.search).get("t");
   if (qp) { document.querySelector('nav button[data-view="consultar"]').click(); $("#fBuscar").code.value = qp; $("#fBuscar").requestSubmit(); }
   store.onAuth(onAuthChange);
