@@ -400,6 +400,26 @@ function demoStore(){
   };
 }
 
+/* Sin internet al abrir: los tickets van a la cola local y se envían al reconectar */
+function offlineStore(){
+  const off = () => { throw new Error("network offline"); };
+  return { offline:true, create:off, get:off, update:off, subscribe(){ return () => {}; },
+    async login(){ throw new Error("Sin internet. Conéctese para entrar al panel."); }, async logout(){}, async reset(){ off(); },
+    onAuth(cb){ cb(null); } };
+}
+let retrying = false;
+async function retryFirebase(){
+  if (retrying) return; retrying = true;
+  const tryNow = async () => {
+    if (!navigator.onLine) return false;
+    document.querySelectorAll('script[src*="firebasejs"]').forEach(s => s.remove());
+    try { store = await firebaseStore(); store.onAuth(onAuthChange); flushQueue(); return true; } catch { return false; }
+  };
+  const loop = async () => { if (!(await tryNow())) setTimeout(loop, 20000); else retrying = false; };
+  window.addEventListener("online", () => { if (store?.offline) tryNow(); });
+  setTimeout(loop, 5000);
+}
+
 function loadScript(src){ return new Promise((ok, fail) => { const s=document.createElement("script"); s.src=src; s.onload=ok; s.onerror=fail; document.head.appendChild(s); }); }
 
 async function firebaseStore(){
@@ -494,7 +514,7 @@ function renderPend(){
 }
 let flushing = false;
 async function flushQueue(){
-  if (flushing || !navigator.onLine || !store) return;
+  if (flushing || !navigator.onLine || !store || store.offline) return;
   flushing = true;
   let q = LS.get(QKEY, []);
   for (const t of [...q]) {
@@ -526,7 +546,7 @@ F().onsubmit = async e => {
   try {
     if ($("#remember").checked) LS.set("mesaAyuda_yo", {nombre:f.nombre, telefono:f.telefono, area:sel.area, ubicacion:f.ubicacion});
     else LS.set("mesaAyuda_yo", null);
-    let offline = !navigator.onLine;
+    let offline = !navigator.onLine || !!store.offline;
     if (!offline) {
       try { await Promise.race([store.create(t), new Promise((_, r) => setTimeout(() => r(new Error("timeout")), 12000))]); }
       catch(err){ if (err.message === "timeout" || /network|offline|unavailable/i.test(err.message)) offline = true; else throw err; }
@@ -862,9 +882,12 @@ $("#btnPrintLabels").onclick = () => {
 /* ---------------- Inicio ---------------- */
 renderAreas();
 (async () => {
-  try { store = DEMO ? demoStore() : await firebaseStore(); }
-  catch(e){ toast("No se pudo conectar con Firebase; usando modo demo"); store = demoStore(); }
-  if (store && (DEMO || !window.firebase)) { $("#demoBar").classList.remove("hidden"); $("#loginHint").textContent = "Modo demo: escriba cualquier correo y la contraseña «admin»."; }
+  if (DEMO) store = demoStore();
+  else {
+    try { store = await firebaseStore(); }
+    catch(e){ store = offlineStore(); retryFirebase(); }
+  }
+  if (DEMO) { $("#demoBar").classList.remove("hidden"); $("#loginHint").textContent = "Modo demo: escriba cualquier correo y la contraseña «admin»."; }
   const qp = new URLSearchParams(location.search).get("t");
   if (qp) { document.querySelector('nav button[data-view="consultar"]').click(); $("#fBuscar").code.value = qp; $("#fBuscar").requestSubmit(); }
   store.onAuth(onAuthChange);
